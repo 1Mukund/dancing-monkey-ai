@@ -1,0 +1,5 @@
+{
+  "name": "Dancing Monkey AI",
+  "description": "A versatile AI voice agent customized with your own knowledge base for specialized tasks and interactions.",
+  "requestFramePermissions": ["microphone"]
+}
