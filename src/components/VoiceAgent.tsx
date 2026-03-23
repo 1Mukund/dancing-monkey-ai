@@ -44,6 +44,7 @@ export default function VoiceAgent({ customKb }: { customKb?: string | null }) {
   const streamRef = useRef<MediaStream | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const sessionRef = useRef<any>(null);
+  const isSessionOpenRef = useRef(false);
   const audioQueueRef = useRef<Float32Array[]>([]);
   const nextStartTimeRef = useRef(0);
   const activeSourcesRef = useRef<AudioBufferSourceNode[]>([]);
@@ -109,6 +110,7 @@ export default function VoiceAgent({ customKb }: { customKb?: string | null }) {
         },
         callbacks: {
           onopen: () => {
+            isSessionOpenRef.current = true;
             setIsConnected(true);
             setIsConnecting(false);
             console.log("Session opened");
@@ -145,6 +147,7 @@ export default function VoiceAgent({ customKb }: { customKb?: string | null }) {
             stopSession();
           },
           onclose: () => {
+            isSessionOpenRef.current = false;
             setIsConnected(false);
             setIsConnecting(false);
             console.log("Session closed");
@@ -160,12 +163,12 @@ export default function VoiceAgent({ customKb }: { customKb?: string | null }) {
       const processor = inputContext.createScriptProcessor(4096, 1, 1);
 
       processor.onaudioprocess = (e) => {
-        if (isMuted) return;
+        if (isMuted || !isSessionOpenRef.current || !sessionRef.current) return;
         const inputData = e.inputBuffer.getChannelData(0);
         const pcmData = float32ToInt16(inputData);
         const base64Data = arrayBufferToBase64(pcmData.buffer);
         
-        session.sendRealtimeInput({
+        sessionRef.current.sendRealtimeInput({
           audio: { data: base64Data, mimeType: 'audio/pcm;rate=16000' }
         });
       };
@@ -182,6 +185,7 @@ export default function VoiceAgent({ customKb }: { customKb?: string | null }) {
   };
 
   const stopSession = () => {
+    isSessionOpenRef.current = false;
     sessionRef.current?.close();
     processorRef.current?.disconnect();
     streamRef.current?.getTracks().forEach(track => track.stop());
