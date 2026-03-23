@@ -90,7 +90,7 @@ export default function VoiceAgent({ customKb }: { customKb?: string | null }) {
       setIsConnecting(true);
       setError(null);
 
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY! });
       
       audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
       nextStartTimeRef.current = 0;
