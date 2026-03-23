@@ -105,8 +105,6 @@ export default function VoiceAgent({ customKb }: { customKb?: string | null }) {
             voiceConfig: { prebuiltVoiceConfig: { voiceName: "Fenrir" } },
           },
           systemInstruction: getSystemInstruction(),
-          inputAudioTranscription: {},
-          outputAudioTranscription: {},
         },
         callbacks: {
           onopen: () => {
